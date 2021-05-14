@@ -18,7 +18,7 @@ public class MonederoTest {
   @BeforeEach
   void init() {
     cuenta = new Cuenta();
-    movimiento = new Movimiento(LocalDate.now(), 5000, true);
+    movimiento = new Extraccion(LocalDate.now(), 5000);
   }
 
   @Test

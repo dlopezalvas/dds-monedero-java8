@@ -12,7 +12,9 @@ import java.util.List;
 public class Cuenta {
 
     private double saldo = 0;
-    private List<Movimiento> movimientos = new ArrayList<>();
+    private List<Movimiento> extracciones = new ArrayList<>();
+    private List<Movimiento> depositos = new ArrayList<>();
+
 
     public Cuenta() {
         saldo = 0;
@@ -22,21 +24,17 @@ public class Cuenta {
         saldo = montoInicial;
     }
 
-    public void setMovimientos(List<Movimiento> movimientos) {
-        this.movimientos = movimientos;
-    }
-
     public void poner(double cuanto) {
         validarMontoPositivo(cuanto);
         validarCantidadExcepciones();
-        agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, true));
+        agregarMovimiento(new Deposito(LocalDate.now(), cuanto), depositos);
     }
 
     public void sacar(double cuanto) {
         validarMontoPositivo(cuanto);
         validarSaldoSuficiente(cuanto);
         validarLimiteExtraccion(cuanto);
-        agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, false));
+        agregarMovimiento(new Extraccion(LocalDate.now(), cuanto), extracciones);
     }
 
     private void validarSaldoSuficiente(double cuanto) {
@@ -52,7 +50,7 @@ public class Cuenta {
     }
 
     private Boolean superoMovimientosDiarios(int cantidadPermitida) {
-        return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadPermitida;
+        return getDepositos().stream().count() >= cantidadPermitida;
     }
 
     private void validarMontoPositivo(double cuanto) {
@@ -70,20 +68,24 @@ public class Cuenta {
         }
     }
 
-    public void agregarMovimiento(Movimiento movimiento) {
+    public void agregarMovimiento(Movimiento movimiento, List <Movimiento> lista) {
         setSaldo(movimiento.valorAActualizar() + getSaldo());
-        movimientos.add(movimiento);
+        lista.add(movimiento);
     }
 
     public double getMontoExtraidoA(LocalDate fecha) { //¿no debería ser private?
-        return getMovimientos().stream()
-                .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
+        return getExtracciones().stream()
+                .filter(extraccion -> extraccion.esDeLaFecha(fecha)) //esto antes usaba getFecha -> rompia encapsulamiento
                 .mapToDouble(Movimiento::getMonto)
                 .sum();
     }
 
-    public List<Movimiento> getMovimientos() {
-        return movimientos;
+    public List<Movimiento> getExtracciones() {
+        return extracciones;
+    }
+
+    public List<Movimiento> getDepositos() {
+        return depositos;
     }
 
     public double getSaldo() {
