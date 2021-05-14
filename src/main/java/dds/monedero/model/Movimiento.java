@@ -8,7 +8,7 @@ public class Movimiento {
   // En su lugar siempre usen numeros de precision arbitraria o punto fijo, como BigDecimal en Java y similares
   // De todas formas, NO es necesario modificar ésto como parte de este ejercicio. 
   private double monto;
-  private boolean esDeposito;
+  private boolean esDeposito; //PRIMITIVE OBSESSION, el "desposito" puede tener su propio comportamiento -> compongo con diferentes tipos de movimientos
 
   public Movimiento(LocalDate fecha, double monto, boolean esDeposito) {
     this.fecha = fecha;
@@ -36,6 +36,7 @@ public class Movimiento {
     return this.fecha.equals(fecha);
   }
 
+  //TYPE TEST en idDeposito y en isEstraccion
   public boolean isDeposito() {
     return esDeposito;
   }
@@ -44,11 +45,13 @@ public class Movimiento {
     return !esDeposito;
   }
 
+  //MISSPLACED METHOD: de esto debería encargarse la cuenta, no el movimiento
   public void agregateA(Cuenta cuenta) {
     cuenta.setSaldo(calcularValor(cuenta));
     cuenta.agregarMovimiento(fecha, monto, esDeposito);
   }
 
+  //MISSPLACED METHOD: de esto debería encargarse la cuenta, no el movimiento
   public double calcularValor(Cuenta cuenta) {
     if (esDeposito) {
       return cuenta.getSaldo() + getMonto();

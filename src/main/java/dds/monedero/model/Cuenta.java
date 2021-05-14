@@ -26,6 +26,8 @@ public class Cuenta {
     this.movimientos = movimientos;
   }
 
+  //DUPLICATED CODE: tengo la misma excepcion en poner y sacar, también agrego un movimiento
+  //LONG METHOD: podría calcular si la cantidad de depositos es mayor a 3
   public void poner(double cuanto) {
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
@@ -38,6 +40,7 @@ public class Cuenta {
     new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
   }
 
+  //LONG METHOD: podría abstraer el fijarme si me pase del limite del día en otro método
   public void sacar(double cuanto) {
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
@@ -54,6 +57,7 @@ public class Cuenta {
     new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
   }
 
+  //LONG PARAMETER LIST - debería directamente tener como parámetro el Movimiento
   public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
     Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
     movimientos.add(movimiento);
