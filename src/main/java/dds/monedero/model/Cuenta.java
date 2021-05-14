@@ -59,7 +59,7 @@ public class Cuenta {
     movimientos.add(movimiento);
   }
 
-  public double getMontoExtraidoA(LocalDate fecha) {
+  public double getMontoExtraidoA(LocalDate fecha) { //¿no debería ser private?
     return getMovimientos().stream()
         .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
         .mapToDouble(Movimiento::getMonto)

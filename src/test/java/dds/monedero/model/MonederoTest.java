@@ -7,19 +7,24 @@ import dds.monedero.exceptions.SaldoMenorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MonederoTest {
   private Cuenta cuenta;
+  private Movimiento movimiento;
 
   @BeforeEach
   void init() {
     cuenta = new Cuenta();
+    movimiento = new Movimiento(LocalDate.now(), 5000, true);
   }
 
   @Test
-  void Poner() {
+  void PonerUnDepositoPositivo() {
     cuenta.poner(1500);
+    assertEquals(cuenta.getSaldo(), 1500);
   }
 
   @Test
@@ -28,14 +33,15 @@ public class MonederoTest {
   }
 
   @Test
-  void TresDepositos() {
+  void PonerTresDepositos() {
     cuenta.poner(1500);
     cuenta.poner(456);
     cuenta.poner(1900);
+    assertEquals(cuenta.getSaldo(), 3856);
   }
 
   @Test
-  void MasDeTresDepositos() {
+  void PonerMasDeTresDepositos() {
     assertThrows(MaximaCantidadDepositosException.class, () -> {
           cuenta.poner(1500);
           cuenta.poner(456);
@@ -63,6 +69,26 @@ public class MonederoTest {
   @Test
   public void ExtraerMontoNegativo() {
     assertThrows(MontoNegativoException.class, () -> cuenta.sacar(-500));
+  }
+
+  @Test
+  public void ExtraerSaldo(){
+    cuenta.poner(1500);
+    cuenta.sacar(500);
+    assertEquals(cuenta.getSaldo(),  1000);
+  }
+
+  @Test
+  public void MontoExtraidoEnUnaFecha(){
+    cuenta.poner(1000);
+    cuenta.sacar(500);
+    cuenta.sacar(250);
+    assertEquals(cuenta.getMontoExtraidoA(LocalDate.now()), 750);
+  }
+
+  @Test
+  public void FechaDeUnMovimiento(){ //no estoy segura si tiene sentido testear esto
+    assertTrue(movimiento.esDeLaFecha(LocalDate.now()));
   }
 
 }
