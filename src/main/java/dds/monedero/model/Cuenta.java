@@ -27,7 +27,6 @@ public class Cuenta {
   }
 
   //DUPLICATED CODE: tengo la misma excepcion en poner y sacar, también agrego un movimiento
-  //LONG METHOD: podría calcular si la cantidad de depositos es mayor a 3
   public void poner(double cuanto) {
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
@@ -41,10 +40,9 @@ public class Cuenta {
   }
 
   private Boolean superoMovimientosDiarios(int cantidadPermitida){
-    return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3);
+    return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadPermitida;
   }
 
-  //LONG METHOD: podría abstraer el fijarme si me pase del limite del día en otro método
   public void sacar(double cuanto) {
     if (cuanto <= 0) {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
@@ -52,13 +50,19 @@ public class Cuenta {
     if (getSaldo() - cuanto < 0) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
+
+    validarLimiteExtraccion(cuanto);
+    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+  }
+
+  private Boolean validarLimiteExtraccion(double extraccion){
     double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
     double limite = 1000 - montoExtraidoHoy;
-    if (cuanto > limite) {
+
+    if (extraccion > limite) {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
-          + " diarios, límite: " + limite);
+              + " diarios, límite: " + limite);
     }
-    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
   }
 
   //LONG PARAMETER LIST - debería directamente tener como parámetro el Movimiento
