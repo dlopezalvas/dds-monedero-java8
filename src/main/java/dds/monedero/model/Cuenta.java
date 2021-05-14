@@ -29,14 +29,14 @@ public class Cuenta {
     public void poner(double cuanto) {
         validarMontoPositivo(cuanto);
         validarCantidadExcepciones();
-        agregarMovimiento(LocalDate.now(), cuanto, true);
+        agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, true));
     }
 
     public void sacar(double cuanto) {
         validarMontoPositivo(cuanto);
         validarSaldoSuficiente(cuanto);
         validarLimiteExtraccion(cuanto);
-        agregarMovimiento(LocalDate.now(), cuanto, false);
+        agregarMovimiento(new Movimiento(LocalDate.now(), cuanto, false));
     }
 
     private void validarSaldoSuficiente(double cuanto) {
@@ -70,9 +70,7 @@ public class Cuenta {
         }
     }
 
-    //LONG PARAMETER LIST - debería directamente tener como parámetro el Movimiento
-    public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
-        Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
+    public void agregarMovimiento(Movimiento movimiento) {
         this.setSaldo(movimiento.calcularValor(this));
         movimientos.add(movimiento);
     }
