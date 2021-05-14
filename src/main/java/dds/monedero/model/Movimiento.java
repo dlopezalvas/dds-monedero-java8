@@ -48,12 +48,11 @@ public class  Movimiento {
     return !esDeposito;
   }
 
-  //MISSPLACED METHOD: de esto debería encargarse la cuenta, no el movimiento
-  public double calcularValor(Cuenta cuenta) {
+  public double valorAActualizar() {
     if (esDeposito) {
-      return cuenta.getSaldo() + getMonto();
+      return getMonto();
     } else {
-      return cuenta.getSaldo() - getMonto();
+      return -getMonto();
     }
   }
 }

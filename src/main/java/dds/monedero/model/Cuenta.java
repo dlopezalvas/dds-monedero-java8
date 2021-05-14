@@ -71,7 +71,7 @@ public class Cuenta {
     }
 
     public void agregarMovimiento(Movimiento movimiento) {
-        this.setSaldo(movimiento.calcularValor(this));
+        setSaldo(movimiento.valorAActualizar() + getSaldo());
         movimientos.add(movimiento);
     }
 
