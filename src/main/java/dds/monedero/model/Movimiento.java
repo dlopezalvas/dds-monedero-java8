@@ -8,7 +8,8 @@ public class Movimiento {
   // En su lugar siempre usen numeros de precision arbitraria o punto fijo, como BigDecimal en Java y similares
   // De todas formas, NO es necesario modificar ésto como parte de este ejercicio. 
   private double monto;
-  private boolean esDeposito; //PRIMITIVE OBSESSION, el "desposito" puede tener su propio comportamiento -> compongo con diferentes tipos de movimientos
+  private boolean esDeposito; //PRIMITIVE OBSESSION, el "desposito" puede tener su propio comportamiento
+
 
   public Movimiento(LocalDate fecha, double monto, boolean esDeposito) {
     this.fecha = fecha;
@@ -24,6 +25,8 @@ public class Movimiento {
     return fecha;
   }
 
+  //no tiene mucho sentido tenerlos, si cambio el booleano tienen el mismo comportamiento que esDeLaFecha (solamente interesa fijarse la fecha)
+  //DUPLICATED METHOD
   public boolean fueDepositado(LocalDate fecha) {
     return isDeposito() && esDeLaFecha(fecha);
   }
