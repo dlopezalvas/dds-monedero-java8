@@ -11,86 +11,89 @@ import java.util.List;
 
 public class Cuenta {
 
-  private double saldo = 0;
-  private List<Movimiento> movimientos = new ArrayList<>();
+    private double saldo = 0;
+    private List<Movimiento> movimientos = new ArrayList<>();
 
-  public Cuenta() {
-    saldo = 0;
-  }
-
-  public Cuenta(double montoInicial) {
-    saldo = montoInicial;
-  }
-
-  public void setMovimientos(List<Movimiento> movimientos) {
-    this.movimientos = movimientos;
-  }
-
-  public void poner(double cuanto) {
-    validarMontoPositivo(cuanto);
-    validarCantidadExcepciones();
-    new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
-  }
-
-  public void sacar(double cuanto) {
-    validarMontoPositivo(cuanto);
-    validarSaldoSuficiente(cuanto);
-    validarLimiteExtraccion(cuanto);
-    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
-  }
-
-  private void validarSaldoSuficiente(double cuanto){
-    if (getSaldo() - cuanto < 0) {
-      throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
+    public Cuenta() {
+        saldo = 0;
     }
-  }
-  private void validarCantidadExcepciones(){
-    if (superoMovimientosDiarios(3)) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
+
+    public Cuenta(double montoInicial) {
+        saldo = montoInicial;
     }
-  }
 
-  private Boolean superoMovimientosDiarios(int cantidadPermitida){
-    return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadPermitida;
-  }
-
-  private void validarMontoPositivo(double cuanto){
-    if (cuanto <= 0) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
+    public void setMovimientos(List<Movimiento> movimientos) {
+        this.movimientos = movimientos;
     }
-  }
-    private void validarLimiteExtraccion(double extraccion){
-    double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
-    double limite = 1000 - montoExtraidoHoy;
-    if (extraccion > limite) {
-      throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
-              + " diarios, límite: " + limite);
+
+    public void poner(double cuanto) {
+        validarMontoPositivo(cuanto);
+        validarCantidadExcepciones();
+        agregarMovimiento(LocalDate.now(), cuanto, true);
     }
-  }
 
-  //LONG PARAMETER LIST - debería directamente tener como parámetro el Movimiento
-  public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
-    Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
-    movimientos.add(movimiento);
-  }
+    public void sacar(double cuanto) {
+        validarMontoPositivo(cuanto);
+        validarSaldoSuficiente(cuanto);
+        validarLimiteExtraccion(cuanto);
+        agregarMovimiento(LocalDate.now(), cuanto, false);
+    }
 
-  public double getMontoExtraidoA(LocalDate fecha) { //¿no debería ser private?
-    return getMovimientos().stream()
-        .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
-        .mapToDouble(Movimiento::getMonto)
-        .sum();
-  }
+    private void validarSaldoSuficiente(double cuanto) {
+        if (getSaldo() - cuanto < 0) {
+            throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
+        }
+    }
 
-  public List<Movimiento> getMovimientos() {
-    return movimientos;
-  }
+    private void validarCantidadExcepciones() {
+        if (superoMovimientosDiarios(3)) {
+            throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
+        }
+    }
 
-  public double getSaldo() {
-    return saldo;
-  }
+    private Boolean superoMovimientosDiarios(int cantidadPermitida) {
+        return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= cantidadPermitida;
+    }
 
-  public void setSaldo(double saldo) {
-    this.saldo = saldo;
-  }
+    private void validarMontoPositivo(double cuanto) {
+        if (cuanto <= 0) {
+            throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
+        }
+    }
+
+    private void validarLimiteExtraccion(double extraccion) {
+        double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
+        double limite = 1000 - montoExtraidoHoy;
+        if (extraccion > limite) {
+            throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
+                    + " diarios, límite: " + limite);
+        }
+    }
+
+    //LONG PARAMETER LIST - debería directamente tener como parámetro el Movimiento
+    public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
+        Movimiento movimiento = new Movimiento(fecha, cuanto, esDeposito);
+        this.setSaldo(movimiento.calcularValor(this));
+        movimientos.add(movimiento);
+    }
+
+    public double getMontoExtraidoA(LocalDate fecha) { //¿no debería ser private?
+        return getMovimientos().stream()
+                .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
+                .mapToDouble(Movimiento::getMonto)
+                .sum();
+    }
+
+    public List<Movimiento> getMovimientos() {
+        return movimientos;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
 
 }
