@@ -33,11 +33,15 @@ public class Cuenta {
       throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
     }
 
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
+    if (superoMovimientosDiarios(3)) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
     }
 
     new Movimiento(LocalDate.now(), cuanto, true).agregateA(this);
+  }
+
+  private Boolean superoMovimientosDiarios(int cantidadPermitida){
+    return getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3);
   }
 
   //LONG METHOD: podría abstraer el fijarme si me pase del limite del día en otro método
